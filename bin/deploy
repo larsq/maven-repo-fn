@@ -1,0 +1,24 @@
+#!/bin/bash
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+APPLICATION_NAME=$(npm ls --depth 0 --json | jq '.name' | tr -d '"')
+VERSION=$(npm ls --depth 0 --json | jq '.version' | tr -d '"')
+VERSION_TAG="${VERSION}+$($DIR/githash)"
+
+ARTIFACT="./build/$APPLICATION_NAME-$VERSION_TAG.zip"
+BUCKET='assets-expenses-3a0537932858235'
+TARGET="gs://$BUCKET/repo/$APPLICATION_NAME/$APPLICATION_NAME-$VERSION_TAG.zip"
+
+if [ ! -f "$ARTIFACT" ]; then
+    echo "File $ARTIFACT does not exists"
+    exit -1
+fi
+
+if [ $(gsutil -q stat "$TARGET") ]; then
+    echo "Object $TARGET already exists"
+    exit -1
+fi
+
+echo "copying $ARTIFACT into $TARGET"
+
+gsutil cp "$ARTIFACT" "$TARGET"

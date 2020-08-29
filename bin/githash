@@ -1,0 +1,6 @@
+#!/bin/sh
+VERSION=$(git rev-parse --short HEAD)
+DIFF=$(git diff @{u} --shortstat)
+DIRTY=$([ -z "$DIFF" ] || echo '.dirty')
+
+echo $VERSION$DIRTY
