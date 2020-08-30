@@ -1,5 +1,5 @@
 {
-  "name": "expenses-userservice",
+  "name": "maven-fn",
   "version": "1.0.4",
   "description": "Accessing user database",
   "main": "index.js",
