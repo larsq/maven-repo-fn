@@ -1,13 +1,14 @@
 const path = require("path");
 
-function authorize(req, type, credentials) {
-  if (!req.headers.authorization) {
-    return false;
-  }
-
-  return req.headers.authorization === `${type} ${credentials}`;
-}
-
+/**
+ * Replace the heading path elements with new ones
+ *
+ * @param {String} path the path to replace
+ * @param {String} prefix the heading path elements to be replace
+ * @param {String} targetPrefix the path elements for replacement
+ *
+ * @returns {String} the new path
+ */
 function replace(path, prefix, targetPrefix) {
   const [nPath, nPrefix, nTargetPrefix] = [
     normalize(path),
@@ -61,4 +62,12 @@ function paths(fullPath) {
   return accumulated;
 }
 
-module.exports = { authorize, replace, paths };
+function env(name) {
+  if (name in process.env) {
+    return process.env[name];
+  }
+
+  throw Error(`${name} not defined`);
+}
+
+module.exports = { env, replace, paths };

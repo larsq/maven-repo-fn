@@ -1,17 +1,10 @@
-const { authorize } = require("./util");
+const { authorizeWithCredentials, credential } = require("./authorize");
 const log = require("bunyan").createLogger({
   name: "request",
   level: process.env.BUNYAN_LOG_LEVEL || "info",
 });
 const { onUploadOrDownload } = require("./files");
-
-function hasCorrectCredentials(req, res, onSuccess) {
-  if (authorize(req, "Basic", "dXNlcjpzZWNyZXQ=")) {
-    onSuccess(req, res);
-  } else {
-    res.status(401).send();
-  }
-}
+const { USERNAME, PASSWORD } = require("./config");
 
 function isGetOrPut(req, res, onSuccess) {
   log.debug(
@@ -50,7 +43,10 @@ function onRequest(handleRequest, filters) {
 }
 
 function factory() {
-  return onRequest(onUploadOrDownload, [isGetOrPut, hasCorrectCredentials]);
+  return onRequest(onUploadOrDownload, [
+    isGetOrPut,
+    authorizeWithCredentials(credential(USERNAME, PASSWORD)),
+  ]);
 }
 
 module.exports = factory;
