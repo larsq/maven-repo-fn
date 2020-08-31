@@ -1,10 +1,10 @@
 const { expect } = require("chai");
-const { credential } = require("../app/authorize");
+const { basicAuth } = require("../app/authorize");
 
 describe("authorize", () => {
-  describe("credential", () => {
+  describe("basicAuth", () => {
     it("should create basic authentication encoded credential", () => {
-      expect(credential("user", "secret")).to.equals("dXNlcjpzZWNyZXQ=");
+      expect(basicAuth("user", "secret")).to.equals("dXNlcjpzZWNyZXQ=");
     });
   });
 });

@@ -13,7 +13,7 @@ function authorize(req, type, credentials) {
  *
  * @returns {String} a Base64 encoded string
  */
-function credential(username, password) {
+function basicAuth(username, password) {
   if (!username || !password) {
     throw Error("username and password must be set");
   }
@@ -21,9 +21,9 @@ function credential(username, password) {
   return Buffer.from(`${username}:${password}`).toString("base64");
 }
 
-function authorizeWithCredentials(credential) {
+function authorizeWithCredentials(type, credential) {
   return function hasCorrectCredentials(req, res, onSuccess) {
-    if (authorize(req, "Basic", credential)) {
+    if (authorize(req, type, credential)) {
       onSuccess(req, res);
     } else {
       res.status(401).send();
@@ -33,5 +33,5 @@ function authorizeWithCredentials(credential) {
 
 module.exports = {
   authorizeWithCredentials,
-  credential,
+  basicAuth,
 };
