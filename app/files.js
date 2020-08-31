@@ -2,6 +2,7 @@ const log = require("bunyan").createLogger({
   name: "files",
   level: process.env.BUNYAN_LOG_LEVEL || "info",
 });
+const { onRequest } = require("./filters");
 
 const { replace } = require("./util");
 
@@ -37,11 +38,17 @@ function download(req, res) {
   res.sendStatus(200);
 }
 
+const onPut = onRequest(upload, []);
+const onGet = onRequest(download, []);
+
 function onUploadOrDownload(req, res) {
-  if (req.method === "PUT") {
-    upload(req, res);
+  const methods = { PUT: onPut, GET: onGet };
+
+  if (req.method in methods) {
+    log.debug(`processing ${req.method}`);
+    methods[req.method](req, res);
   } else {
-    download(req, res);
+    res.status(405).send();
   }
 }
 
