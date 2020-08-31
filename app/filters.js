@@ -24,22 +24,25 @@ function onRequest(handleRequest, filters) {
   };
 }
 
-function isGetOrPut(req, res, onSuccess) {
-  log.debug(
-    `received request ${req.method} ${req.path} ${JSON.stringify(req.headers)}`
-  );
+/**
+ * Creates a filer to check if method is acceptable
+ * otherwise send a 405 error response
+ * @param {String[]} methods list of acceptable methods
+ */
+function acceptMethods(methods) {
+  return function acceptMethods(req, res, onSuccess) {
+    const method = req.method;
 
-  switch (req.method) {
-    case "GET":
-    case "PUT":
+    if (methods.some((e) => e === method)) {
       onSuccess(req, res);
-      break;
-    default:
+    } else {
+      log.debug(`${req.method} is not allowed: allowed methods are ${methods}`);
       res.status(405).send();
-  }
+    }
+  };
 }
 
 module.exports = {
-  isGetOrPut,
+  acceptMethods,
   onRequest,
 };
