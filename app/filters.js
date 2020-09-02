@@ -69,9 +69,21 @@ function rewritePath(sourcePathPrefix, replaceWith) {
   };
 }
 
+function acceptedContentType(contentType) {
+  return function acceptedContentType(req, res, onSuccess) {
+    if (req.headers["content-type"] !== contentType) {
+      res.sendStatus(415);
+      return;
+    }
+
+    onSuccess(req, res);
+  };
+}
+
 module.exports = {
   acceptMethods,
   onRequest,
   switchOnMethod,
   rewritePath,
+  acceptedContentType,
 };
