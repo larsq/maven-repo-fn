@@ -2,20 +2,11 @@ const log = require("bunyan").createLogger({
   name: "files",
   level: process.env.BUNYAN_LOG_LEVEL || "info",
 });
-const { onRequest, switchOnMethod } = require("./filters");
-
-const { replace } = require("./util");
+const { onRequest, switchOnMethod, rewritePath } = require("./filters");
 
 function upload(req, res) {
-  const targetPath = replace(req.path, "repo", "maven-repo");
-
-  if (!targetPath) {
-    res.sendStatus(400);
-    return;
-  }
-
   log.debug(
-    `upload to path=${targetPath} length=${req.headers["content-length"]} type=${req.headers["content-type"]}`
+    `upload to path=${req.path} length=${req.headers["content-length"]} type=${req.headers["content-type"]}`
   );
 
   if (req.headers["content-type"] !== "application/octet-stream") {
@@ -27,18 +18,11 @@ function upload(req, res) {
 }
 
 function download(req, res) {
-  const targetPath = replace(req.path, "repo", "maven-repo");
-
-  if (!targetPath) {
-    res.sendStatus(400);
-    return;
-  }
-
-  log.info(`download from path ${targetPath}`);
+  log.info(`download from path ${req.path}`);
   res.sendStatus(200);
 }
 
-const onPut = onRequest(upload, []);
-const onGet = onRequest(download, []);
+const onPut = onRequest(upload, [rewritePath("repo", "maven-repo")]);
+const onGet = onRequest(download, [rewritePath("repo", "maven-repo")]);
 
 module.exports = switchOnMethod({ PUT: onPut, GET: onGet });

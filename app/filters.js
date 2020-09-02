@@ -1,3 +1,5 @@
+const { replace } = require("./util");
+
 const log = require("bunyan").createLogger({
   name: "filters",
   level: process.env.BUNYAN_LOG_LEVEL || "info",
@@ -53,8 +55,23 @@ function switchOnMethod(methods) {
   };
 }
 
+function rewritePath(sourcePathPrefix, replaceWith) {
+  return function rewrite(req, res, onSuccess) {
+    const targetPath = replace(req.path, sourcePathPrefix, replaceWith);
+
+    if (!targetPath) {
+      res.status(400).send();
+      return;
+    }
+
+    req.path = targetPath;
+    onSuccess(req, res);
+  };
+}
+
 module.exports = {
   acceptMethods,
   onRequest,
   switchOnMethod,
+  rewritePath,
 };
