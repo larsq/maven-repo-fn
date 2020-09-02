@@ -42,7 +42,19 @@ function acceptMethods(methods) {
   };
 }
 
+function switchOnMethod(methods) {
+  return function onUploadOrDownload(req, res) {
+    if (req.method in methods) {
+      log.debug(`processing ${req.method}`);
+      methods[req.method](req, res);
+    } else {
+      res.status(405).send();
+    }
+  };
+}
+
 module.exports = {
   acceptMethods,
   onRequest,
+  switchOnMethod,
 };

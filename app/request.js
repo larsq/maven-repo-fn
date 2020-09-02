@@ -1,10 +1,10 @@
 const { authorizeWithCredentials, basicAuth } = require("./authorize");
 const { onRequest, acceptMethods } = require("./filters");
-const { onUploadOrDownload } = require("./files");
+const fileRequest = require("./files");
 const { USERNAME, PASSWORD } = require("./config");
 
 function factory() {
-  return onRequest(onUploadOrDownload, [
+  return onRequest(fileRequest, [
     acceptMethods(["GET", "PUT"]),
     authorizeWithCredentials("Basic", basicAuth(USERNAME, PASSWORD)),
   ]);
