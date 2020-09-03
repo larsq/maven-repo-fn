@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const { paths } = require("./util");
 const { IOError } = require("./exceptions");
 const logger = require("bunyan").createLogger({
   name: "FsDriver",
@@ -9,6 +8,7 @@ const logger = require("bunyan").createLogger({
 
 class FsDriver {
   constructor(directory) {
+    logger.info("Creating driver, setting root to %s", directory);
     this.directory = directory;
   }
 
@@ -38,6 +38,8 @@ class FsDriver {
       })
       .catch((err) => {
         if (err.code === "ENOENT") {
+          logger.debug("creating non-existent directories: %s", relativePath);
+
           return fs.promises
             .mkdir(fullPath, { recursive: true })
             .then(() => fullPath);
@@ -48,6 +50,8 @@ class FsDriver {
   }
 
   download(relativePath) {
+    log.debug("download file: %s", relativePath);
+
     const fullPath = path.join(this.root, relativePath);
 
     return Promise.resolve(fullPath)
@@ -67,7 +71,7 @@ class FsDriver {
   upload(relativePath, stream) {
     const fullPath = path.join(this.root, relativePath);
 
-    logger.debug("uploading file to %s", fullPath);
+    logger.debug("uploading file: %s", relativePath);
 
     return this.existing(path.dirname(relativePath))
       .then(() =>
