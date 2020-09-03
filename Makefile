@@ -32,7 +32,7 @@ test:	## Run tests
 	npm test
 
 local_run:  ## Run locally
-	BUNYAN_LOG_LEVEL=debug \
+	BUNYAN_LOG_LEVEL=debug AUTH_USERNAME=user AUTH_PASSWORD=secret \
 	node startserver.js
 
 info:
