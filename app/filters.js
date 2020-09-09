@@ -2,7 +2,7 @@ const { replace } = require("./util");
 
 const log = require("bunyan").createLogger({
   name: "filters",
-  level: process.env.BUNYAN_LOG_LEVEL || "info",
+  level: process.env.BUNYAN_LEVEL || "info",
 });
 
 function createCallback(filters, fn) {
