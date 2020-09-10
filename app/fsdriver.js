@@ -1,10 +1,9 @@
+const process = require("process");
 const fs = require("fs");
 const path = require("path");
 const { IOError } = require("./exceptions");
-const logger = require("bunyan").createLogger({
-  name: "FsDriver",
-  level: process.env.BUNYAN_LEVEL || "info",
-});
+const { env } = require("./util");
+const logger = require("./logfactory").logger("FsDrive");
 
 class FsDriver {
   constructor(directory) {
@@ -12,8 +11,55 @@ class FsDriver {
     this.directory = directory;
   }
 
+  /**
+   * @returns {String} the root
+   */
   get root() {
     return this.directory;
+  }
+
+  get interface() {
+    const that = this;
+
+    return {
+      upload: function upload(req, res) {
+        logger.info(
+          `upload to path=${req.path} length=${req.headers["content-length"]} type=${req.headers["content-type"]}`
+        );
+
+        that
+          .upload(req.path, req.body)
+          .then(() => {
+            res.sendStatus(200);
+          })
+          .catch((err) => {
+            logger.error(err);
+            res.status(500).send();
+          });
+      },
+
+      download: function download(req, res) {
+        logger.info(`download from path ${req.path}`);
+
+        that
+          .download(req.path)
+          .then((buffer) => {
+            res.status(200).send(buffer);
+          })
+          .catch((err) => {
+            if (err.code === "ENOENT") {
+              logger.warn(`${req.path} does not exists`);
+              res.status(404).send();
+            } else if (err.code === "EISDIR") {
+              logger.warn(`${req.path} is a directory`);
+              res.status(404).send();
+            } else {
+              logger.error(err);
+              res.status(500).send();
+            }
+          });
+      },
+    };
   }
 
   /**
@@ -50,7 +96,7 @@ class FsDriver {
   }
 
   download(relativePath) {
-    log.debug("download file: %s", relativePath);
+    logger.debug("download file: %s", path.join(this.root, relativePath));
 
     const fullPath = path.join(this.root, relativePath);
 
@@ -76,13 +122,19 @@ class FsDriver {
     return this.existing(path.dirname(relativePath))
       .then(() =>
         fs.promises.writeFile(fullPath, stream, {
-          flag: "wx",
+          flag: "w",
         })
       )
       .catch((err) => {
         logger.error("error while uploading: %s (%s)", err.message, err.code);
         throw new IOError(err.message, err.code);
       });
+  }
+
+  static create() {
+    const path = env("FSDRIVER_PATH");
+
+    return new FsDriver(path);
   }
 }
 

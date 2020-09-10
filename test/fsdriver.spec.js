@@ -4,7 +4,6 @@ const { IOError } = require("../app/exceptions");
 const tempy = require("tempy");
 const del = require("del");
 const fs = require("fs");
-const { assert } = require("console");
 
 describe("FsDriver", () => {
   describe("create", () => {
@@ -86,17 +85,19 @@ describe("FsDriver", () => {
         })
         .then((actualBuffer) => {
           expect(actualBuffer).to.exist;
-          expect(actualBuffer.equals(buffer)).to.be.true;
+          expect(actualBuffer).to.eqls(buffer);
         });
     });
 
-    it("should reject a promise if there are already a file with same name", () => {
+    it("should promise despite there are already a file with same name", () => {
       return instance
         .upload("file.txt", buffer)
-        .then(() => expect.fail())
-        .catch((err) => {
-          expect(err).is.instanceOf(IOError);
-          expect(err.code).to.equals("EEXIST");
+        .then(() => {
+          return fs.promises.readFile(`${root}/dir/file2.txt`);
+        })
+        .then((actualBuffer) => {
+          expect(actualBuffer).to.exist;
+          expect(actualBuffer.equals(buffer)).to.be.true;
         });
     });
   });
@@ -149,5 +150,4 @@ describe("FsDriver", () => {
         });
     });
   });
-
 });

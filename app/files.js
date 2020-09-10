@@ -1,7 +1,3 @@
-const log = require("bunyan").createLogger({
-  name: "files",
-  level: process.env.BUNYAN_LOG_LEVEL || "info",
-});
 const {
   onRequest,
   switchOnMethod,
@@ -9,23 +5,15 @@ const {
   acceptedContentType,
 } = require("./filters");
 
-function upload(req, res) {
-  log.debug(
-    `upload to path=${req.path} length=${req.headers["content-length"]} type=${req.headers["content-type"]}`
-  );
+const FsDriver = require("./fsdriver");
 
-  res.sendStatus(200);
-}
+const instance = FsDriver.create();
 
-function download(req, res) {
-  log.info(`download from path ${req.path}`);
-  res.sendStatus(200);
-}
-
-const onPut = onRequest(upload, [
+const onPut = onRequest(instance.interface.upload, [
   rewritePath("repo", "maven-repo"),
   acceptedContentType("application/octet-stream"),
 ]);
-const onGet = onRequest(download, [rewritePath("repo", "maven-repo")]);
+
+const onGet = onRequest(instance.interface.download, [rewritePath("repo", "maven-repo")]);
 
 module.exports = switchOnMethod({ PUT: onPut, GET: onGet });

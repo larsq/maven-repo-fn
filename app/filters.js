@@ -1,9 +1,5 @@
 const { replace } = require("./util");
-
-const log = require("bunyan").createLogger({
-  name: "filters",
-  level: process.env.BUNYAN_LEVEL || "info",
-});
+const log = require("./logfactory").logger("filters");
 
 function createCallback(filters, fn) {
   let unprocessed = Array.from(filters);
@@ -47,7 +43,7 @@ function acceptMethods(methods) {
 function switchOnMethod(methods) {
   return function onUploadOrDownload(req, res) {
     if (req.method in methods) {
-      log.debug(`processing ${req.method}`);
+      log.debug(`processing ${req.method} ${req.path}`);
       methods[req.method](req, res);
     } else {
       res.status(405).send();
@@ -57,14 +53,16 @@ function switchOnMethod(methods) {
 
 function rewritePath(sourcePathPrefix, replaceWith) {
   return function rewrite(req, res, onSuccess) {
-    const targetPath = replace(req.path, sourcePathPrefix, replaceWith);
+    const targetPath = replace(req.url, sourcePathPrefix, replaceWith);
 
     if (!targetPath) {
       res.status(400).send();
       return;
     }
 
-    req.path = targetPath;
+    log.debug(`path rewritten '${req.url}'=>'${targetPath}'`);
+
+    req.url = targetPath;
     onSuccess(req, res);
   };
 }

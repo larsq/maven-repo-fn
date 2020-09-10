@@ -28,7 +28,7 @@ describe("util", () => {
       ];
 
       targets.forEach((target) => {
-        expect(target).to.be.equal("target/given/target");
+        expect(target).to.be.equal("/target/given/target");
       });
     });
   });
