@@ -5,19 +5,29 @@ const { IOError } = require("./exceptions");
 const { env } = require("./util");
 const logger = require("./logfactory").logger("FsDrive");
 
+/**
+ * Class that uploads and download files from file system.
+ * This class is mainly used for local testing.
+ */
 class FsDriver {
+  /**
+   * @param {string} directory the root for files
+   */
   constructor(directory) {
     logger.info("Creating driver, setting root to %s", directory);
     this.directory = directory;
   }
 
   /**
-   * @returns {String} the root
+   * the root for driver
    */
   get root() {
     return this.directory;
   }
 
+  /**
+   * interface provided for express.js framework
+   */
   get interface() {
     const that = this;
 
@@ -64,9 +74,9 @@ class FsDriver {
 
   /**
    * Promise that a given path exists.
-   * @param {?String} relativePath the relative path from root. If undefined, the root
+   * @param {string} [relativePath] the relative path from root. If undefined, the root
    * is used
-   * @returns {Promise<String>} a promise that this path exists
+   * @returns {Promise<string>} a promise that this path exists
    */
   existing(relativePath) {
     const fullPath = relativePath
@@ -95,6 +105,11 @@ class FsDriver {
       });
   }
 
+  /**
+   * Promise to get the buffer of the file
+   * @param {string} relativePath the relative path to root
+   * @returns {Promise<Buffer>}
+   */
   download(relativePath) {
     logger.debug("download file: %s", path.join(this.root, relativePath));
 
@@ -114,6 +129,12 @@ class FsDriver {
       });
   }
 
+  /**
+   * Promise to store buffer at specified location
+   * @param {string} relativePath the relative path to root
+   * @param {Buffer} stream the buffer to store
+   * 
+   */
   upload(relativePath, stream) {
     const fullPath = path.join(this.root, relativePath);
 
@@ -131,6 +152,11 @@ class FsDriver {
       });
   }
 
+  /**
+   * Factory method to create instance. The root is provided from FSDRIVER_PATH
+   * environment variable
+   * @returns {FsDriver} a new instance
+   */
   static create() {
     const path = env("FSDRIVER_PATH");
 

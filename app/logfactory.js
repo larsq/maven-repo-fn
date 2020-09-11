@@ -1,7 +1,19 @@
 const bunyan = require("bunyan");
 const process = require("process");
 
+/**
+ * Factory for logger instances. The factory keeps 
+ * track of instantiated loggers and can be used for
+ * dynamically adjust the log levels
+ */
 class LoggerFactory {
+  /**
+   * 
+   * @param {string} [defaultLevel] the default level for loggers
+   * 
+   * If defaultLevel is not specified, the level is get from the BUNYAN_LEVEL system variable or defaults
+   * to "info" if the variable is not set.
+   */
   constructor(defaultLevel) {
     this._level = defaultLevel || process.env.BUNYAN_LEVEL || "info";
     this._loggers = {};
@@ -10,7 +22,7 @@ class LoggerFactory {
   /**
    * Adjust log level of exsting ones and set the default level
    * to the new one
-   * @param {?String} newLevel the new level or pick the one in  the BUNYAN_LEVEL env variable
+   * @param {String} [newLevel] the new level or pick the one in  the BUNYAN_LEVEL env variable
    * @returns {string} the new effective level
    */
   adjust(newLevel) {
