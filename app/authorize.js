@@ -8,10 +8,10 @@ function authorize(req, type, credentials) {
 
 /**
  * Genrates basic authorization encoded credentials from username/password
- * @param {String} username the username
- * @param {String} password password in clear text
+ * @param {string} username the username
+ * @param {string} password password in clear text
  *
- * @returns {String} a Base64 encoded string
+ * @returns {string} a Base64 encoded string
  */
 function basicAuth(username, password) {
   if (!username || !password) {

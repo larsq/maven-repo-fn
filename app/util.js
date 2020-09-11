@@ -3,11 +3,11 @@ const path = require("path");
 /**
  * Replace the heading path elements with new ones
  *
- * @param {String} path the path to replace
- * @param {String} prefix the heading path elements to be replace
- * @param {String} targetPrefix the path elements for replacement
+ * @param {string} path the path to replace
+ * @param {string} prefix the heading path elements to be replace
+ * @param {string} targetPrefix the path elements for replacement
  *
- * @returns {String} the new path
+ * @returns {string} the new path
  */
 function replace(path, prefix, targetPrefix) {
   const [nPath, nPrefix, nTargetPrefix] = [
@@ -25,7 +25,7 @@ function replace(path, prefix, targetPrefix) {
 
 /**
  * Normalize path to neither start nor end with slash
- * @param {String} path the path to normalize
+ * @param {string} path the path to normalize
  */
 function normalize(path) {
   if (path === "/") {
@@ -46,8 +46,8 @@ function normalize(path) {
  * @example
  * // returns ["foo", "foo/bar"]
  * paths("foo/bar")
- * @param {String} fullPath the path to expand
- * @returns {String[]} Returns array of string, each of the elements
+ * @param {string} fullPath the path to expand
+ * @returns {string[]} Returns array of string, each of the elements
  * specifies the full path of the descendants
  */
 function paths(fullPath) {
@@ -62,6 +62,13 @@ function paths(fullPath) {
   return accumulated;
 }
 
+/**
+ * Gives value of env variable with specified name
+ * @param {string} name the name of the env variable
+ * @returns {string} the value of the specified variable. The
+ * method throws an Error if the environment variable is not
+ * defined
+ */
 function env(name) {
   if (name in process.env) {
     return process.env[name];
