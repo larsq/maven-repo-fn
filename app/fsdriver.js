@@ -1,4 +1,3 @@
-const process = require("process");
 const fs = require("fs");
 const path = require("path");
 const { IOError } = require("./exceptions");
@@ -19,7 +18,8 @@ class FsDriver {
   }
 
   /**
-   * the root for driver
+   * the absolute path for the root in the file system
+   * @type string
    */
   get root() {
     return this.directory;
