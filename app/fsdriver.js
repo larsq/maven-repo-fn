@@ -37,10 +37,10 @@ class FsDriver {
           `upload to path=${req.path} length=${req.headers["content-length"]} type=${req.headers["content-type"]}`
         );
 
-        that
+        return that
           .upload(req.path, req.body)
           .then(() => {
-            res.sendStatus(200);
+            res.status(200).send();
           })
           .catch((err) => {
             logger.error(err);
@@ -51,7 +51,7 @@ class FsDriver {
       download: function download(req, res) {
         logger.info(`download from path ${req.path}`);
 
-        that
+        return that
           .download(req.path)
           .then((buffer) => {
             res.status(200).send(buffer);
@@ -133,7 +133,7 @@ class FsDriver {
    * Promise to store buffer at specified location
    * @param {string} relativePath the relative path to root
    * @param {Buffer} stream the buffer to store
-   * 
+   *
    */
   upload(relativePath, stream) {
     const fullPath = path.join(this.root, relativePath);
