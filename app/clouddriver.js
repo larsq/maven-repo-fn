@@ -1,4 +1,6 @@
-const { Request, Response } = require("express");
+const { Storage } = require("@google-cloud/storage");
+const { Readable } = require("stream");
+const { env } = require("./util");
 
 /**
  * Express Callback
@@ -75,14 +77,50 @@ class CloudDriver {
    * @returns {Promise} a promise representing the content of the path as Buffer
    */
   download(bucketPath) {
-    //return Promise.resolve();
+    logger.info(`download file ${this._bucket}:${bucketPath}`);
+
+    let storage = new Storage();
+
+    return storage
+      .bucket(this._bucket)
+      .file(bucketPath)
+      .download()
+      .then((buffer) => {
+        logger.info("file downloaded");
+        return buffer;
+      })
+      .catch((err) => {
+        logger.error(err);
+        throw err;
+      });
   }
 
   upload(bucketPath, content) {
-    //return Promise.resolve();
+    let storage = new Storage();
+    let sink = storage
+      .bucket(this._bucket)
+      .file(bucketPath)
+      .createWriteStream();
+
+    let source = new Readable({
+      read() {
+        this.push(content);
+        this.push(null);
+      },
+    });
+
+    source.pipe(sink, {
+      end: true,
+    });
+
+    return new Promise((resolve) => sink.on("finish", resolve));
   }
 
-  static create() {}
+  static create() {
+    const bucketName = env("GCP_BUCKET");
+
+    return new CloudDriver(bucketName);
+  }
 }
 
 module.exports = CloudDriver;

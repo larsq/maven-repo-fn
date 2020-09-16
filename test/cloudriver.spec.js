@@ -1,10 +1,16 @@
 const chai = require("chai");
-const expect = chai.expect;
-const CloudDriver = require("../app/clouddriver");
 const sinon = require("sinon");
-const { mockRequest, mockResponse } = require("mock-req-res");
+const {
+  rewire,
+  givenAssets,
+  clearAssets,
+  getAssetSync,
+} = require("./gcpstorage");
 
 chai.use(require("chai-sinon"));
+const expect = chai.expect;
+
+const CloudDriver = rewire("../app/clouddriver");
 
 describe("CloudDriver", () => {
   describe("Create", () => {
@@ -15,19 +21,51 @@ describe("CloudDriver", () => {
     });
   });
 
+  describe("Download", () => {
+    let instance;
+
+    beforeEach(() => {
+      instance = new CloudDriver("bucket");
+      givenAssets(["/path/to/asset"]);
+    });
+
+    afterEach(() => {
+      clearAssets();
+    });
+
+    it("should download asset from gcp", () => {
+      return instance.download("/path/to/asset").then((buffer) => {
+        expect(buffer).to.eqls(Buffer.from("downloaded"));
+      });
+    });
+  });
+
+  describe("Upload", () => {
+    let instance;
+
+    beforeEach(() => {
+      instance = new CloudDriver("bucket");
+      clearAssets();
+    });
+
+    afterEach(() => {
+      clearAssets();
+    });
+
+    it("should upload asset to gcp", () => {
+      return instance
+        .upload("/path/to/assets", Buffer.from("asset"))
+        .then(() => {
+          expect(getAssetSync("/path/to/assets")).to.eqls("uploaded");
+        });
+    });
+  });
+
   describe("Members", () => {
     it("should return the name of the bucket", () => {
       let instance = new CloudDriver("bucket");
 
       expect(instance.bucket).to.equals("bucket");
-    });
-  });
-
-  describe("Interface", () => {
-    let instance;
-
-    beforeEach(() => {
-      instance = new CloudDriver("bucket");
     });
   });
 });

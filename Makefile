@@ -32,8 +32,13 @@ test:	## Run tests
 	npm test
 
 local_run:  ## Run locally
-	FSDRIVER_PATH=/tmp/repo BUNYAN_LOG_LEVEL=debug AUTH_USERNAME=user AUTH_PASSWORD=secret \
+	SOURCE_PATH=repo TARGET_PATH=maven-repo RUN_MODE=local FSDRIVER_PATH=/tmp/repo BUNYAN_LOG_LEVEL=debug AUTH_USERNAME=user AUTH_PASSWORD=secret \
 	node startserver.js
+
+cloud_run:  ## Run locally
+	SOURCE_PATH=repo TARGET_PATH=maven-repo RUN_MODE=cloud GCP_BUCKET=bucket BUNYAN_LOG_LEVEL=debug AUTH_USERNAME=user AUTH_PASSWORD=secret \
+	node startserver.js
+
 
 info:
 	@echo "${APPLICATION_NAME}-${APPLICATION_VERSION}+${GIT_HASH}"
