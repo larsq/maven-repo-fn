@@ -19,11 +19,14 @@ It will translate a HTTP request, GET or PUT, uses the relative path and access 
 Configuration
 ------------
 
-* SOURCE_PATH
-* AUTH_USERNAME
-* AUTH_PASSWORD
-* GCP_BUCKET_PATH
-* GCP_BUCKET_NAME
+* BUNYAN_LOG  log level for application, info if environment variable is missing
+* SOURCE_PATH the expected source path that should be omitted, use '/' for no path
+* TARGET_PATH the target source path that should the root path
+* AUTH_USERNAME the username that should be used in the basic authorization for the proxy
+* AUTH_PASSWORD the password that should be used in conjunction with the username as authorization
+* RUN_MODE could be ```local``` or ```cloud```. Local will upload/download files from file system and cloud will use a GCP Storage Bucket
+* FSDRIVER_PATH points to the local root that will be used for local run
+* GCP_BUCKET refers to the bucket that is used by the cloud run
 
 Building
 ------------
@@ -39,3 +42,8 @@ life-cycle:
 * Help
 
 Project requires ```yarn``` as package manager and ```m̀ake``` command.
+
+Installation
+------------
+The zip file that is created by ```m̀ake build``` should be uploaded to GCP and deployed as a google function. The function should be reached without authentication and will be kept secured given the defined username and password. The service account that is associated with the function should have
+read and write privileges for the specified bucket.
