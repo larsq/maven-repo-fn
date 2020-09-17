@@ -16,8 +16,12 @@ function replace(path, prefix, targetPrefix) {
     normalize(targetPrefix),
   ];
 
+  if (nPrefix === "") {
+    return `${nTargetPrefix}/${nPath}`;
+  }
+
   if (nPath.startsWith(`${nPrefix}/`)) {
-    return nPath.replace(`${nPrefix}/`, `/${nTargetPrefix}/`);
+    return nPath.replace(`${nPrefix}/`, `${nTargetPrefix}/`);
   }
 
   return undefined;

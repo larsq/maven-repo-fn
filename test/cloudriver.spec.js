@@ -1,5 +1,5 @@
 const chai = require("chai");
-const sinon = require("sinon");
+const { IOError } = require("../app/exceptions");
 const {
   rewire,
   givenAssets,
@@ -37,6 +37,18 @@ describe("CloudDriver", () => {
       return instance.download("/path/to/asset").then((buffer) => {
         expect(buffer).to.eqls(Buffer.from("downloaded"));
       });
+    });
+
+    it("should reject download if asset does not exists", () => {
+      return instance.download("/path/to/other/assets").then(
+        () => {
+          expect.fail();
+        },
+        (err) => {
+          expect(err).to.be.instanceOf(IOError);
+          expect(err.code).to.equals("ENOENT");
+        }
+      );
     });
   });
 

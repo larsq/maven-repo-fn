@@ -20,6 +20,11 @@ class FakeStorage {
     return this;
   }
 
+  exists() {
+    const exists = !!FakeStorage.assets[this._path];
+    return Promise.resolve([exists]);
+  }
+
   download() {
     return Promise.resolve(FakeStorage.assets[this._path]);
   }
@@ -105,7 +110,7 @@ module.exports = {
   /**
    * Inspects the set blob for given path
    * @param {string} givenPath the content of given path
-   * @returns {Buffer|undefined} the blob for the path or undefined 
+   * @returns {Buffer|undefined} the blob for the path or undefined
    */
   getAssetSync: function getAssetSync(givenPath) {
     return FakeStorage.assets[givenPath];

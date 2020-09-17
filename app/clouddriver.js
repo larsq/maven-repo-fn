@@ -1,5 +1,6 @@
 const { Storage } = require("@google-cloud/storage");
 const { Readable } = require("stream");
+const { IOError } = require("./exceptions");
 const { env } = require("./util");
 
 /**
@@ -54,7 +55,11 @@ class CloudDriver {
             res.status(200).send(buffer);
           })
           .catch((err) => {
-            res.status(500).send();
+            if (err.code === "ENOENT") {
+              res.send(404).send();
+            } else {
+              res.status(500).send();
+            }
           });
       },
 
@@ -79,12 +84,17 @@ class CloudDriver {
   download(bucketPath) {
     logger.info(`download file ${this._bucket}:${bucketPath}`);
 
-    let storage = new Storage();
+    let file = new Storage().bucket(this._bucket).file(bucketPath);
 
-    return storage
-      .bucket(this._bucket)
-      .file(bucketPath)
-      .download()
+    return file
+      .exists()
+      .then(([exists]) => {
+        if (!exists) {
+          throw new IOError(`File ${bucketPath} does not exists`, "ENOENT");
+        }
+
+        return file.download();
+      })
       .then((buffer) => {
         logger.info("file downloaded");
         return buffer;
