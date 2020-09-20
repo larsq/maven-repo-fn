@@ -95,7 +95,7 @@ class CloudDriver {
 
         return file.download();
       })
-      .then((buffer) => {
+      .then(([buffer]) => {
         logger.info("file downloaded");
         return buffer;
       })

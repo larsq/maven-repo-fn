@@ -26,7 +26,7 @@ class FakeStorage {
   }
 
   download() {
-    return Promise.resolve(FakeStorage.assets[this._path]);
+    return Promise.resolve([FakeStorage.assets[this._path]]);
   }
 
   createWriteStream() {
