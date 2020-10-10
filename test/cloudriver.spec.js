@@ -7,7 +7,6 @@ const {
   getAssetSync,
 } = require("./gcpstorage");
 
-chai.use(require("chai-sinon"));
 const expect = chai.expect;
 
 const CloudDriver = rewire("../app/clouddriver");

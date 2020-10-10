@@ -7,7 +7,7 @@ const LogFactory = require("../app/logfactory");
 
 const expect = chai.expect;
 
-chai.use(require("chai-sinon"));
+chai.use(require("sinon-chai"));
 
 function assertContractOf(classInstance, displayName) {
   return describe(displayName, () => {
